@@ -18,6 +18,14 @@ public class RegisterAccountService : IRegisterAccountService
         _razorViewToStringRenderer = razorViewToStringRenderer;
     }
 
+    public async Task<string> GetEmail()
+    {
+        var confirmAccountModel = new ConfirmAccountEmailViewModel($"/{Guid.NewGuid()}");
+
+        return await _razorViewToStringRenderer.RenderViewToStringAsync("/Views/Emails/ConfirmAccount/ConfirmAccountEmail.cshtml", confirmAccountModel);
+
+    }
+    
     public async Task Register(string email, string baseUrl)
     {
         // TODO: Validation + actually add the User to a DB + whatever else
@@ -63,4 +71,5 @@ public class RegisterAccountService : IRegisterAccountService
 public interface IRegisterAccountService
 {
     Task Register(string email, string baseUrl);
+    Task<string> GetEmail();
 }

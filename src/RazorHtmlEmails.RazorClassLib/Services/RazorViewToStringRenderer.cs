@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 
 namespace RazorHtmlEmails.RazorClassLib.Services;
 
@@ -20,9 +21,8 @@ public class RazorViewToStringRenderer : IRazorViewToStringRenderer
     private readonly IRazorViewEngine _viewEngine;
     private readonly ITempDataProvider _tempDataProvider;
     private readonly IServiceProvider _serviceProvider;
-
-    public RazorViewToStringRenderer(
-        IRazorViewEngine viewEngine,
+    
+    public RazorViewToStringRenderer(IRazorViewEngine viewEngine,
         ITempDataProvider tempDataProvider,
         IServiceProvider serviceProvider)
     {
@@ -59,13 +59,29 @@ public class RazorViewToStringRenderer : IRazorViewToStringRenderer
 
     private IView FindView(ActionContext actionContext, string viewName)
     {
+        var contentRootPath = @"C:\GIT\RazorHtmlEmails\src\TestConsoleApp\bin\Debug\net6.0";
+        string executingAssemblyDirectoryAbsolutePath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        string executingAssemblyDirectoryRelativePath = System.IO.Path.GetRelativePath(contentRootPath, executingAssemblyDirectoryAbsolutePath);
+
+        string executingFilePath = $"{executingAssemblyDirectoryAbsolutePath.Replace('\\', '/')}/Views/Emails/ConfirmAccount/ConfirmAccountEmail.cshtml";
+        string viewPath = "~/Views/Emails/ConfirmAccount/ConfirmAccountEmail.cshtml";
+        string mainViewRelativePath = $"~/{executingAssemblyDirectoryRelativePath.Replace('\\','/')}/Views/Emails/ConfirmAccount/ConfirmAccountEmail.cshtml";
+
+        
         var getViewResult = _viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
+        var getViewResult2 = _viewEngine.GetView(executingFilePath, viewPath, isMainPage: true);
+        
+        var getViewResult3 = _viewEngine.FindView(actionContext, viewName,false);
         if (getViewResult.Success)
         {
             return getViewResult.View;
         }
 
         var findViewResult = _viewEngine.FindView(actionContext, viewName, isMainPage: true);
+        
+        
+        var findViewResult2 = _viewEngine.FindView(actionContext, viewName, isMainPage:true);
+
         if (findViewResult.Success)
         {
             return findViewResult.View;
